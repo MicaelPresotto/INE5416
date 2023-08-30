@@ -1,8 +1,7 @@
 areaTriangulo :: Float -> Float -> Float
 areaTriangulo x y = (x * y)/2
+main :: IO ()
 main = do
-    xis <- getLine
-    yu <- getLine
-    let x = read xis :: Float
-    let y = read yu :: Float
+    x <- readLn :: IO Float
+    y <- readLn :: IO Float
     print(areaTriangulo x y)
