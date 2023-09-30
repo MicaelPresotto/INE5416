@@ -11,6 +11,9 @@ def is_a_valid_move(matrix, row, col, num):
             if matrix[i][j] == num:
                 return False
     #fazer agora a comparacao da celula para ver as possibilidades
+    if row == col == 0 and matrix[row][col] > matrix[row][col+1] or row == col == 0 and matrix[row][col] < matrix[row+1][col]:
+        return False
+    # 81 ifs ou um if gigante com ors e ands seria horrivel(que no caso seria para cada celula), pensar em uma solucao mais eficiente
 
     return True
 
