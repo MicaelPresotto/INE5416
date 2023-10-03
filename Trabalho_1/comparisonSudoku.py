@@ -1,4 +1,7 @@
-def is_a_valid_move(matrix, row, col, num):
+import time
+
+def is_a_valid_move(matrix, row, col, num, comparacao):
+    
     for i in range(9):
         #verificando se o numero ja existe na linha ou na coluna
         if matrix[row][i] == num or matrix[i][col] == num:
@@ -10,12 +13,46 @@ def is_a_valid_move(matrix, row, col, num):
         for j in range(col_start, col_start + 3):
             if matrix[i][j] == num:
                 return False
-    #fazer agora a comparacao da celula para ver as possibilidades
-    if row == col == 0 and matrix[row][col] > matrix[row][col+1] or row == col == 0 and matrix[row][col] < matrix[row+1][col]:
-        return False
-    # 81 ifs ou um if gigante com ors e ands seria horrivel(que no caso seria para cada celula), pensar em uma solucao mais eficiente
+    position = row * 9 + col
+
+    #comparacoes da celula para ver as possibilidades
+    if comparacao[position][0] == 1:
+        #nesse caso a celula de cima eh maior que a atual, caso nao for retorna false 
+        if num < matrix[row-1][col] and matrix[row-1][col]:
+            return False
+    elif comparacao[position][0] == 0:
+        #nesse caso a celula de cima eh menor que a atual, caso nao for retorna false
+        if num > matrix[row-1][col] and matrix[row-1][col]:
+            return False
+    if comparacao[position][1] == 1:
+        #nesse caso a celula da direita eh maior que a atual, caso nao for retorna false
+        if num < matrix[row][col+1] and matrix[row][col+1]:
+            return False
+    elif comparacao[position][1] == 0:
+        #nesse caso a celula da direita eh menor que a atual, caso nao for retorna false
+        if num > matrix[row][col+1] and matrix[row][col+1]:
+            return False
+    if comparacao[position][2] == 1:
+        #nesse caso a celula de baixo eh maior que a atual, caso nao for retorna false
+        if num < matrix[row+1][col] and matrix[row+1][col]:
+            return False
+    elif comparacao[position][2] == 0:
+        #nesse caso a celula de baixo eh menor que a atual, caso nao for retorna false
+        if num > matrix[row+1][col] and matrix[row+1][col]:
+            return False
+    if comparacao[position][3] == 1:
+        #nesse caso a celula da esquerda eh maior que a atual, caso nao for retorna false
+        if num < matrix[row][col-1] and matrix[row][col-1]:
+            return False
+    elif comparacao[position][3] == 0:
+        #nesse caso a celula da esquerda eh menor que a atual, caso nao for retorna false
+        if num > matrix[row][col-1] and matrix[row][col-1]:
+            return False
 
     return True
+
+#matriz de comparacao
+matriz_comp = [[-1, 1, 1, -1], [-1, 0, 0, 0], [-1, -1, 0, 1], [-1, 1, 1, -1], [-1, 1, 1, 0], [-1, -1, 0, 0], [-1, 0, 0, -1], [-1, 1, 0, 1], [-1, -1, 1, 0], [0, 0, 0, -1], [1, 1, 1, 1], [1, -1, 0, 0], [0, 0, 0, -1], [0, 1, 1, 1], [1, -1, 0, 0], [1, 0, 0, -1], [1, 1, 1, 1], [0, -1, 1, 0], [1, 0, -1, -1], [0, 0, -1, 1], [1, -1, -1, 1], [1, 1, -1, -1], [0, 0, -1, 0], [1, -1, -1, 1], [1, 1, -1, -1], [0, 1, -1, 0], [0, -1, -1, 0], [-1, 0, 0, -1], [-1, 1, 1, 1], [-1, -1, 0, 0], [-1, 1, 1, -1], [-1, 1, 1, 0], [-1, -1, 1, 0], [-1, 0, 1, -1], [-1, 1, 1, 1], [-1, -1, 0, 0], [1, 1, 1, -1], [0, 0, 1, 0], [1, -1, 1, 1], [0, 1, 1, -1], [0, 1, 0, 0], [0, -1, 0, 0], [0, 1, 0, -1], [0, 0, 0, 0], [1, -1, 1, 1], [0, 1, -1, -1], [0, 0, -1, 0], [0, -1, -1, 1], [0, 0, -1, -1], [1, 0, -1, 1], [1, -1, -1, 1], [1, 0, -1, -1], [1, 0, -1, 1], [0, -1, -1, 1], [-1, 0, 0, -1], [-1, 0, 1, 1], [-1, -1, 1, 1], [-1, 0, 0, -1], [-1, 0, 1, 1], [-1, -1, 1, 1], [-1, 0, 0, -1], [-1, 1, 1, 1], [-1, -1, 1, 0], [1, 1, 1, -1], [0, 0, 0, 0], [0, -1, 1, 1], [1, 1, 1, -1], [0, 0, 0, 0], [0, -1, 1, 1], [1, 1, 1, -1], [0, 0, 0, 0], [0, -1, 0, 1], [0, 0, -1, -1], [1, 1, -1, 1], [0, -1, -1, 0], [0, 0, -1, -1], [1, 1, -1, 1], [0, -1, -1, 0], [0, 0, -1, -1], [1, 0, -1, 1], [1, -1, -1, 1]]
 
 def solve(matrix):
     for row in range(9):
@@ -25,7 +62,7 @@ def solve(matrix):
                 for num in range(1,10):
                     #testo todos os numeros de 1 a 9
                     # e vejo se eh valido
-                    if is_a_valid_move(matrix, row, col, num):
+                    if is_a_valid_move(matrix, row, col, num, matriz_comp):
                         #caso for adiciono ele
                         matrix[row][col] = num
                         #chamo a funcao recursivamente para a proxima celula
@@ -42,7 +79,12 @@ def solve(matrix):
     return True
 
 if __name__ == '__main__':
+    inicio = time.time()
     matrix = [[0 for j in range(9)]for i in range(9)]
-    solve(matrix)
-    for i in matrix:
-        print(i)
+    if solve(matrix):
+        for i in matrix:
+            print(i)
+        fim = time.time()
+        print(f'Tempo total de execucao {fim - inicio}s')
+    else:
+        print('Nao ha solucao possivel')
