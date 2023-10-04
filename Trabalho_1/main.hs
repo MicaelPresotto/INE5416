@@ -10,7 +10,7 @@ matrizComparacao = [[-1, 1, 1, -1], [-1, 0, 0, 0], [-1, -1, 0, 1], [-1, 1, 1, -1
 matrizPossibilidades :: [[Int]]
 
 matrizPossibilidades =
-    [ [j | j <- [(limite i [] 1)!!0 .. (10 - (limite i [] 0)!!0)]]
+    [ [(head (limite i [] 1)) .. (10 - head (limite i [] 0))]
     | i <- [0..80]
     ]
 
@@ -35,9 +35,9 @@ for indice posicao solucao possibilidades
 resolve :: Int -> Int -> [Int] -> [[Int]] -> Maybe [Int]
 
 resolve elemento posicao solucao possibilidades
-    | elem elemento (obtemLinha (posicao `div` 9) solucao) = Nothing
-    | elem elemento (obtemColuna (posicao `mod` 9) solucao) = Nothing
-    | elem elemento (obtemRegiao (posicao `div` 27) ((posicao `mod` 9) `div` 3) solucao) = Nothing
+    | elemento `elem` obtemLinha (posicao `div` 9) solucao = Nothing
+    | elemento `elem` obtemColuna (posicao `mod` 9) solucao = Nothing
+    | elemento `elem` obtemRegiao (posicao `div` 27) ((posicao `mod` 9) `div` 3) solucao = Nothing
     | not (compara elemento posicao solucao) = Nothing
     | posicao == 80 = Just (trocaElemento 80 elemento solucao)
     | otherwise =
@@ -57,11 +57,11 @@ compara elemento posicao matriz =
         esquerda = posicao - 1
         comparaPosicao c p =
             case c of
-                1 -> if matriz!!p /= 0 then matriz!!p < elemento else True
-                0 -> if matriz!!p /= 0 then matriz!!p > elemento else True
+                1 -> ((matriz!!p) == 0) || (matriz!!p < elemento)
+                0 -> ((matriz!!p) == 0) || (matriz!!p > elemento)
                 _ -> True
     in
-        comparaPosicao (matrizComparacao !! posicao !! 0) acima &&
+        comparaPosicao (head (matrizComparacao !! posicao)) acima &&
         comparaPosicao (matrizComparacao !! posicao !! 1) direita &&
         comparaPosicao (matrizComparacao !! posicao !! 2) abaixo &&
         comparaPosicao (matrizComparacao !! posicao !! 3) esquerda
@@ -74,7 +74,7 @@ obtemLinha linha matriz =
 
 obtemColuna :: Int -> [Int] -> [Int]
 obtemColuna coluna matriz =
-    [matriz!!i | i <- [coluna, coluna+9 .. coluna+72]]    
+    [matriz!!i | i <- [coluna, coluna+9 .. coluna+72]]
 
 
 obtemRegiao :: Int -> Int -> [Int] -> [Int]
@@ -84,7 +84,7 @@ obtemRegiao x_regiao y_regiao matriz =
 
 limite :: Int -> [Int] -> Int -> [Int]
 limite posicao visitados comp
-    | elem posicao visitados = 0:visitados
+    | posicao `elem` visitados = 0:visitados
     | otherwise =
         let
             novos_visitados = posicao : visitados
@@ -92,12 +92,12 @@ limite posicao visitados comp
             direita = posicao + 1
             abaixo = posicao + 9
             esquerda = posicao - 1
-            resAcima = if (matrizComparacao !! posicao !! 0 == comp) then limite acima novos_visitados comp else 0 : novos_visitados
-            resDireita = if (matrizComparacao !! posicao !! 1 == comp) then limite direita (drop 1 resAcima) comp else 0 : (drop 1 resAcima) 
-            resAbaixo = if (matrizComparacao !! posicao !! 2 == comp) then limite abaixo (drop 1 resDireita) comp else 0 : (drop 1 resDireita)
-            resEsquerda = if (matrizComparacao !! posicao !! 3 == comp) then limite esquerda (drop 1 resAbaixo) comp else 0 : (drop 1 resAbaixo)
+            resAcima = if head (matrizComparacao !! posicao) == comp then limite acima novos_visitados comp else 0 : novos_visitados
+            resDireita = if matrizComparacao !! posicao !! 1 == comp then limite direita (drop 1 resAcima) comp else 0 : drop 1 resAcima
+            resAbaixo = if matrizComparacao !! posicao !! 2 == comp then limite abaixo (drop 1 resDireita) comp else 0 : drop 1 resDireita
+            resEsquerda = if matrizComparacao !! posicao !! 3 == comp then limite esquerda (drop 1 resAbaixo) comp else 0 : drop 1 resAbaixo
         in
-            (1 + resAcima!!0 + resDireita!!0 + resAbaixo!!0 + resEsquerda!!0):(drop 1 resEsquerda)
+            (1 + head resAcima + head resDireita + head resAbaixo + head resEsquerda): drop 1 resEsquerda
 
 
 mostrarSudokuFormatado :: [Int] -> String
@@ -116,7 +116,7 @@ main :: IO ()
 main = do
     let solucao = replicate 81 0
     let possibilidades = matrizPossibilidades
-    let resultado = for (length (possibilidades !! 0)-1) 0 solucao possibilidades
+    let resultado = for (length (head possibilidades)-1) 0 solucao possibilidades
     case resultado of
         Just res -> putStrLn (mostrarSudokuFormatado res)
         Nothing -> putStrLn "Não há solução."
