@@ -14,33 +14,26 @@ matrix_comparation = []
 
 for i in range(81):
     element = []
-    if i%27 <=8:
+    if i%27 <=8 or i//9 == 0:
         element.append(-1)
-    elif i//9 > 0:
+    else:
         element.append(1) if matrix[i] > matrix[i-9] else element.append(0)
-    else:
-        element.append(-1)
 
-    if i%3 == 2:
+    if i%3 == 2 or i%9 == 8:
         element.append(-1)
-    elif i%9 < 8:
+    else:
         element.append(1) if matrix[i] > matrix[i+1] else element.append(0)
-    else:
-        element.append(-1)
 
-    if i%27 >= 18:
+    if i%27 >= 18 or i//9 == 8:
         element.append(-1)
-    elif i//9 < 8:
+    else:
         element.append(1) if matrix[i] > matrix[i+9] else element.append(0)
-    else:
-        element.append(-1)
     
-    if not i%3:
+    if not i%3 or not i%9:
         element.append(-1)
-    elif i%9 > 0:
-        element.append(1) if matrix[i] > matrix[i-1] else element.append(0)
     else:
-        element.append(-1)
+        element.append(1) if matrix[i] > matrix[i-1] else element.append(0)
+
     matrix_comparation.append(element)
 
 # cima direita baixo esquerda
